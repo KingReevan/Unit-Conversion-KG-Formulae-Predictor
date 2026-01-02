@@ -52,22 +52,3 @@ def run_formula_tests(
             continue
 
     return passed / len(test_cases)
-
-
-formula = "centimeters = meters * 100"
-
-test_cases = [
-    TestCase(input_value=1.0, expected_output=100.0),
-    TestCase(input_value=2.5, expected_output=250.0),
-    TestCase(input_value=0.0, expected_output=50.0),   #Purposely incorrect test case
-    TestCase(input_value=10.0, expected_output=1000.0),
-    TestCase(input_value=0.1, expected_output=10.0),
-    TestCase(input_value=5.75, expected_output=575.0),
-    TestCase(input_value=100.0, expected_output=10000.0),
-    TestCase(input_value=0.001, expected_output=0.1),
-    TestCase(input_value=50.0, expected_output=5000.0),
-    TestCase(input_value=-1.0, expected_output=-100.0),
-]
-
-score = run_formula_tests(formula, test_cases)
-print(score)  # 1.0 if all pass

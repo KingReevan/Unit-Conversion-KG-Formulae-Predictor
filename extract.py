@@ -187,13 +187,14 @@ class AskFormula(dspy.Module):
         self.validator = ConversionValidator()
         self.predict = dspy.Predict(self.FormulaSignature) #The Formula Signature is passed here
 
-    def forward(self, units: ExtractedUnits) -> FormulaResult | None:
+    def forward(self, units: ExtractedUnits, feedback: str = "") -> FormulaResult | None:
         """
         Docstring for forward
         
         :param self: The AskFormula Instance
         :param from_unit: The unit to be converted from
         :param to_unit: The unit to be converted to
+        :param feedback: Feedback from previous test case failures to improve formula accuracy
         """
 
         is_valid = self.validator(units)
@@ -201,7 +202,7 @@ class AskFormula(dspy.Module):
         if not is_valid:
             return None # Conversion is not meaningful so it will return None 
         
-        raw_predicted_formula = self.predict(from_unit=units.from_unit, to_unit=units.to_unit) #Prediction is performed here
+        raw_predicted_formula = self.predict(from_unit=units.from_unit, to_unit=units.to_unit, feedback=feedback) #Prediction is performed here
         print(raw_predicted_formula)
 
         # Validate output after LLM prediction
