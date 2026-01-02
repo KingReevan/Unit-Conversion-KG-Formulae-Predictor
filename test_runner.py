@@ -61,6 +61,34 @@ def run_formula_tests(
 
     return score, failed_cases 
 
+def failed_test_cases_to_markdown(
+    failed_cases: List[TestCase],
+    formula: str | None = None
+) -> str:
+    if not failed_cases:
+        return ""
+
+    lines = []
+
+    lines.append("### ❌ Failed Test Cases\n")
+
+    if formula:
+        lines.append(f"The formula `{formula}` failed the following tests:\n")
+    else:
+        lines.append("The generated formula failed the following tests:\n")
+
+    lines.append("| # | Input Value | Expected Output |")
+    lines.append("|---|-------------|-----------------|")
+
+    for idx, case in enumerate(failed_cases, start=1):
+        lines.append(
+            f"| {idx} | {case.input_value} | {case.expected_output} |"
+        )
+
+    lines.append("\nPlease correct the formula so that **all tests pass**.")
+
+    return "\n".join(lines)
+
 
 # formula = "centimeters = meters * 100"
 
@@ -74,3 +102,6 @@ def run_formula_tests(
 # score, failures = run_formula_tests(formula, test_cases)
 # print(score)  # 1.0 if all pass
 # print(failures)  # [] if all pass
+
+# markdown_report = failed_test_cases_to_markdown(failures, formula)
+# print(markdown_report)  # Markdown report of failed test cases
