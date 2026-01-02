@@ -74,9 +74,6 @@ class KGAgent(dspy.Module):
             **Formula:**
             {result.formula}
 
-            bash
-            Copy code
-
             **Test Results:**  
             Passed **{10 - len(failed_cases)} / 10** test cases.
 
