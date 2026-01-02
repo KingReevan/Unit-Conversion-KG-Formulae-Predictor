@@ -2,6 +2,7 @@ import dspy
 from extract import ExtractUnits, ask_formula, test_case_generator
 from neo import lookup_conversion, store_conversion, ConversionRelation
 from test_runner import run_formula_tests
+from extract import ExtractedUnits, TestCase
 
 #The pipeline
 class KGAgent(dspy.Module):
@@ -42,11 +43,12 @@ class KGAgent(dspy.Module):
             print(f"Generated Test Cases: {test_cases.test_cases}")
 
             #The test runner will return a score based on how many test cases passed
-            score: int = run_formula_tests(
+            score, failed_cases  = run_formula_tests(
                 formula = result.formula,
                 test_cases = test_cases.test_cases
             )
             print(f"Formula Test Score: {score}")
+            print(f"Failed Test Cases: {failed_cases}")
             
             #If the score is above a certain threshold, the formula is stored in the KG (At least 8 cases have to pass) and the loop breaks
             if(score >= 0.8):

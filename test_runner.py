@@ -9,12 +9,14 @@ def run_formula_tests(
     *,
     rel_tol: float = 1e-9,
     abs_tol: float = 1e-12,
-) -> float:
+) -> tuple[float, List[TestCase]]:
     """
     Runs test cases against a unit conversion formula.
 
     Returns:
-        A score between 0.0 and 1.0 indicating the fraction of passing tests.
+        (score, failed_test_cases)
+        - score: float between 0.0 and 1.0
+        - failed_test_cases: list of TestCase objects that failed
     """
 
     # Parse formula once
@@ -31,6 +33,7 @@ def run_formula_tests(
     input_var = rhs_vars[0].name
 
     passed = 0
+    failed_cases: List[TestCase] = []
 
     for case in test_cases:
         try:
@@ -46,9 +49,28 @@ def run_formula_tests(
                 abs_tol=abs_tol,
             ):
                 passed += 1
+            else:
+                failed_cases.append(case)
 
         except Exception:
             # Any evaluation failure counts as test failure
-            continue
+            failed_cases.append(case)
 
-    return passed / len(test_cases)
+
+    score = passed / len(test_cases)
+
+    return score, failed_cases 
+
+
+# formula = "centimeters = meters * 100"
+
+# test_cases = [
+#     TestCase(input_value=1.0, expected_output=100.0),
+#     TestCase(input_value=2.5, expected_output=2950.0),
+#     TestCase(input_value=0.0, expected_output=40.0),
+#     TestCase(input_value=-1.0, expected_output=-100.0),
+# ]
+
+# score, failures = run_formula_tests(formula, test_cases)
+# print(score)  # 1.0 if all pass
+# print(failures)  # [] if all pass

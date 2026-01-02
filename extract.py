@@ -203,7 +203,6 @@ class AskFormula(dspy.Module):
             return None # Conversion is not meaningful so it will return None 
         
         raw_predicted_formula = self.predict(from_unit=units.from_unit, to_unit=units.to_unit, feedback=feedback) #Prediction is performed here
-        print(raw_predicted_formula)
 
         # Validate output after LLM prediction
         validated = FormulaResult.model_validate(raw_predicted_formula.toDict())
