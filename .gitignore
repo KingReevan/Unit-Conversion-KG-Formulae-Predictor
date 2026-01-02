@@ -1,0 +1,106 @@
+############################
+# Python bytecode & cache
+############################
+__pycache__/
+*.py[cod]
+*$py.class
+
+############################
+# Virtual environments
+############################
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+############################
+# Environment variables
+############################
+.env
+.env.*
+!.env.example
+
+############################
+# Dependency & build artifacts
+############################
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+############################
+# Logs & runtime files
+############################
+*.log
+*.pid
+
+############################
+# Test / coverage reports
+############################
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+############################
+# Neo4j (VERY IMPORTANT)
+############################
+data/
+logs/
+import/
+metrics/
+transactions/
+
+############################
+# Async / multiprocessing
+############################
+*.lock
+
+############################
+# Jupyter notebooks
+############################
+.ipynb_checkpoints/
+
+############################
+# Editor & OS files
+############################
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+############################
+# CLI / temp output
+############################
+output/
+tmp/
+temp/
+
+############################
+# MyPy / type checking
+############################
+.mypy_cache/
+.dmypy.json
+
+############################
+# Ruff / linting
+############################
+.ruff_cache/
+
+############################
+# PyInstaller
+############################
+*.spec
+
+############################
+# Local config overrides
+############################
+config.local.yaml
+config.local.json
