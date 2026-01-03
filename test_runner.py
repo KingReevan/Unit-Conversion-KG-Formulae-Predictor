@@ -1,7 +1,7 @@
 import math
 from typing import List
 from pydantic import BaseModel, field_validator
-from engine import parse_formula, evaluate_formula
+from engine import parse_formula, evaluate_formula, normalize_variables
 from extract import TestCase
 
 class TestRunnerOutput(BaseModel):
@@ -24,6 +24,8 @@ def run_formula_tests(
         - failed_test_cases: list of TestCase objects that failed
     """
 
+    formula = normalize_variables(formula)
+    print("Normalized formula in test runner: ", formula)
     # Parse formula once
     lhs_str, lhs, rhs_expr = parse_formula(formula)
 
@@ -46,7 +48,6 @@ def run_formula_tests(
                 formula,
                 **{input_var: case.input_value}
             ) #The formula is evaluated here, input is the formula string and the test case input value
-
             if math.isclose(     #Compares the expected output and actual
                 output,
                 case.expected_output,
@@ -99,7 +100,7 @@ def failed_test_cases_to_markdown(
     return "\n".join(lines)
 
 
-# formula = "centimeters = meters * 100"
+# formula = "centimeters = meters per hour* 100"
 
 # test_cases = [
 #     TestCase(input_value=1.0, expected_output=100.0),
@@ -109,8 +110,7 @@ def failed_test_cases_to_markdown(
 # ]
 
 # score, failures = run_formula_tests(formula, test_cases)
+# print("Test Results: ", formula)
 # print(score)  # 1.0 if all pass
 # print(failures)  # [] if all pass
 
-# markdown_report = failed_test_cases_to_markdown(failures, formula)
-# print(markdown_report)  # Markdown report of failed test cases

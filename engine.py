@@ -1,4 +1,15 @@
 from sympy import symbols, sympify, Eq, solve
+import re
+
+VARIABLE_PATTERN = re.compile(
+    r'\b([a-zA-Z]+(?:\s+[a-zA-Z]+)+)\b'
+)
+
+def normalize_variables(formula: str) -> str:
+    def replacer(match):
+        return match.group(1).replace(" ", "_")
+
+    return VARIABLE_PATTERN.sub(replacer, formula)
 
 
 def parse_formula(formula: str):
@@ -15,10 +26,6 @@ def parse_formula(formula: str):
     lhs = symbols(lhs_str)  #Converts the LHS into a sympy symbol
     rhs_str: str = rhs_str.replace('×','*').replace("÷", "/")   
     rhs_expr = sympify(rhs_str)  #Converts RHS into a sympy expression
-
-    print(lhs)
-    print(lhs_str)
-    print(rhs_str)
 
     return lhs_str, lhs, rhs_expr
 
@@ -73,4 +80,5 @@ def invert_formula(formula: str) -> str:
     inverse_formula = f"{u2_str} = {inverse_expr}"
 
     return inverse_formula
+
 
