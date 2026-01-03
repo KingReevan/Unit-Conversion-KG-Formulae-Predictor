@@ -19,7 +19,7 @@ def parse_formula(formula: str):
     print(lhs)
     print(lhs_str)
     print(rhs_str)
-    
+
     return lhs_str, lhs, rhs_expr
 
 
@@ -74,4 +74,3 @@ def invert_formula(formula: str) -> str:
 
     return inverse_formula
 
-parse_formula("meters = centimeters / 100")

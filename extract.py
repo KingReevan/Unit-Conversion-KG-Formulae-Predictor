@@ -100,7 +100,6 @@ class FormulaTestCaseGenerator(dspy.Module):
         The formula represents a deterministic mathematical relationship.
 
         Rules:
-        - Generate EXACTLY 10 test cases.
         - Each test case must include:
             - input_value (float)
             - expected_output (float)
@@ -115,10 +114,12 @@ class FormulaTestCaseGenerator(dspy.Module):
             - negative value
             - large value
             - edge case relevant to the formula
-        - Do NOT include explanations and give sensible values only. For example, avoid negative values for units that cannot be negative.
-        - Do NOT include units in the test cases, only numerical values.
-        - DO NOT repeat input values.
-        - DO NOT perform any calculations; Only retrieval.
+
+        Constraints:
+        - Generate EXACTLY 10 test cases.
+        - Ensure high precision for 'expected_output'.
+        - If the unit represents a physical quantity that cannot be negative (e.g., length, mass), do not generate negative inputs.
+        - Return raw floats, no units strings.
         """
 
         formula: str = dspy.InputField(
@@ -131,14 +132,16 @@ class FormulaTestCaseGenerator(dspy.Module):
 
     def __init__(self):
         super().__init__()
-        self.predict = dspy.Predict(self.FormulaTestCaseSignature)
+        # ChainOfThought is used to allow the model to "think" about the math
+        self.generate = dspy.ChainOfThought(self.FormulaTestCaseSignature)
 
     def forward(self, formula: str) -> TestCaseSet:
-        raw = self.predict(formula=formula)
+        print("Using Chain of Thought for Test Case Generation")
+        prediction = self.generate(formula=formula)
 
         # Convert DSPy output → Pydantic
         validated = TestCaseSet.model_validate(
-            {"test_cases": raw.test_cases}
+            {"test_cases": prediction.test_cases}
         )
 
         return validated
