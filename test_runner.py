@@ -4,6 +4,9 @@ from pydantic import BaseModel, field_validator
 from engine import parse_formula, evaluate_formula
 from extract import TestCase
 
+class TestRunnerOutput(BaseModel):
+    score: float
+    failed_test_cases: List[TestCase]
 
 def run_formula_tests(
     formula: str,
@@ -11,7 +14,7 @@ def run_formula_tests(
     *,
     rel_tol: float = 1e-9,
     abs_tol: float = 1e-12,
-) -> tuple[float, List[TestCase]]:
+) -> TestRunnerOutput:
     """
     Runs test cases against a unit conversion formula.
 
@@ -59,9 +62,13 @@ def run_formula_tests(
             failed_cases.append(case)
 
 
-    score = passed / len(test_cases)
-
-    return score, failed_cases 
+    test_score = passed / len(test_cases)
+    output = TestRunnerOutput(
+        score=test_score,
+        failed_test_cases=failed_cases
+    )
+    
+    return output
 
 def failed_test_cases_to_markdown(
     failed_cases: List[TestCase],

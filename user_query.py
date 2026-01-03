@@ -1,7 +1,7 @@
 import dspy
 from extract import ExtractUnits, ConversionValidator, AskFormula, FormulaTestCaseGenerator, ExtractedUnits, FormulaResult
 from neo import lookup_conversion, store_conversion, ConversionRelation
-from test_runner import run_formula_tests, failed_test_cases_to_markdown 
+from test_runner import run_formula_tests, failed_test_cases_to_markdown, TestRunnerOutput
 
 #The pipeline
 class KGAgent(dspy.Module):
@@ -50,15 +50,16 @@ class KGAgent(dspy.Module):
             print(f"Generated Test Cases: {test_cases.test_cases}")
 
             #The test runner will return a score based on how many test cases passed
-            score, failed_cases  = run_formula_tests(
+            
+            test_runner_output: TestRunnerOutput = run_formula_tests(
                 formula = result.formula,
                 test_cases = test_cases.test_cases
             )
-            print(f"Formula Test Score: {score}")
-            print(f"Failed Test Cases: {failed_cases}")
+            print(f"Formula Test Score: {test_runner_output.score}")
+            print(f"Failed Test Cases: {test_runner_output.failed_test_cases}")
 
             #If the score is above a certain threshold, the formula is stored in the KG (At least 8 cases have to pass) and the loop breaks
-            if(score >= 0.8):
+            if(test_runner_output.score >= 0.8):
                 data = ConversionRelation.model_validate(
                 {
                         "from_unit":units.from_unit,
@@ -71,7 +72,7 @@ class KGAgent(dspy.Module):
                 return f"I learned this rule from the LLM: {result.formula}"
 
             #Else, the feedback score is sent back to the AskFormula module for fine-tuning 
-            markdown_feedback: str = failed_test_cases_to_markdown(failed_cases, result.formula)
+            markdown_feedback: str = failed_test_cases_to_markdown(test_runner_output.failed_test_cases, result.formula)
 
             feedback: str = f"""
             ## 🔍 Formula Evaluation Feedback
@@ -80,7 +81,7 @@ class KGAgent(dspy.Module):
             {result.formula}
 
             **Test Results:**  
-            Passed **{10 - len(failed_cases)} / 10** test cases.
+            Passed **{10 - len(test_runner_output.failed_test_cases)} / 10** test cases.
 
             {markdown_feedback}
 
