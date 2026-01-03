@@ -11,6 +11,7 @@ dspy.configure(
     )
 )
 
+
 #Pydantics Models
 class ExtractedUnits(BaseModel):
     from_unit: str
@@ -33,6 +34,7 @@ class TestCaseSet(BaseModel):
             raise ValueError("Exactly 10 test cases are required")
         return v
 
+
 #Signature to extract and clean conversion units, returns pydantic
 class ExtractUnits(dspy.Module):
     def __init__(self) -> None:
@@ -43,6 +45,7 @@ class ExtractUnits(dspy.Module):
         raw_units = self.extract(question=question)
         cleaned_units = ExtractedUnits.model_validate(raw_units.toDict())
         return cleaned_units
+
 
 class ConversionValidator(dspy.Module):
     class ConversionValiditySignature(dspy.Signature):
@@ -86,6 +89,7 @@ class ConversionValidator(dspy.Module):
             to_unit=units.to_unit
         )
         return result.valid
+
 
 class FormulaTestCaseGenerator(dspy.Module):
 
@@ -185,7 +189,7 @@ class AskFormula(dspy.Module):
         self.validator = ConversionValidator()
         self.predict = dspy.Predict(self.FormulaSignature) #The Formula Signature is passed here
 
-    def forward(self, units: ExtractedUnits, feedback: str = "") -> FormulaResult | None:
+    def forward(self, units: ExtractedUnits, feedback: str = "") -> FormulaResult:
         """
         Docstring for forward
         
@@ -200,8 +204,3 @@ class AskFormula(dspy.Module):
         # Validate output after LLM prediction
         validated = FormulaResult.model_validate(raw_predicted_formula.toDict())
         return validated
-
-#Class Instances
-conversion_validator = ConversionValidator()
-ask_formula = AskFormula()
-test_case_generator = FormulaTestCaseGenerator()

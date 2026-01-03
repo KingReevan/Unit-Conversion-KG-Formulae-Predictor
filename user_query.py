@@ -1,5 +1,5 @@
 import dspy
-from extract import ExtractUnits, conversion_validator, ask_formula, test_case_generator, ExtractedUnits, TestCase
+from extract import ExtractUnits, ConversionValidator, AskFormula, FormulaTestCaseGenerator, ExtractedUnits, FormulaResult
 from neo import lookup_conversion, store_conversion, ConversionRelation
 from test_runner import run_formula_tests, failed_test_cases_to_markdown 
 
@@ -8,6 +8,9 @@ class KGAgent(dspy.Module):
     def __init__(self):
         super().__init__()
         self.extract_units = ExtractUnits()
+        self.conversion_validator = ConversionValidator()
+        self.ask_formula = AskFormula()
+        self.test_case_generator = FormulaTestCaseGenerator()
 
     def forward(self, question: str) -> str:
         # STEP 1: Extract units
@@ -25,7 +28,7 @@ class KGAgent(dspy.Module):
         feedback: str = ""
 
         #Conversion Validator checks if the unit conversion is possible
-        is_valid = conversion_validator(units)
+        is_valid: bool = self.conversion_validator(units)
 
         if not is_valid:
             print("Conversion is not possible")
@@ -37,15 +40,13 @@ class KGAgent(dspy.Module):
             # STEP 3: If formula is missing (lookup_conversion gives None) → Ask LLM for the formula
             print("Loop Counter = ", loop_counter)
 
-            result = ask_formula(units=units,feedback=feedback)  # returns a FormulaResult instance
-            if(result is None):
-                return "The conversion between these units is not meaningful."
+            result: FormulaResult = self.ask_formula(units=units,feedback=feedback)  # returns a FormulaResult instance
             
             print(f"LLM provided formula: {result.formula}")
 
             #Test the "Ask Formula" Agents output by Generating Test Cases 
             
-            test_cases = test_case_generator(result.formula)  #Returns a TestCaseSet instance which is already validated beforehand
+            test_cases = self.test_case_generator(result.formula)  #Returns a TestCaseSet instance which is already validated beforehand
             print(f"Generated Test Cases: {test_cases.test_cases}")
 
             #The test runner will return a score based on how many test cases passed
