@@ -1,8 +1,7 @@
 import dspy
-from extract import ExtractUnits, ask_formula, test_case_generator
+from extract import ExtractUnits, conversion_validator, ask_formula, test_case_generator, ExtractedUnits, TestCase
 from neo import lookup_conversion, store_conversion, ConversionRelation
-from test_runner import run_formula_tests, failed_test_cases_to_markdown
-from extract import ExtractedUnits, TestCase
+from test_runner import run_formula_tests, failed_test_cases_to_markdown 
 
 #The pipeline
 class KGAgent(dspy.Module):
@@ -12,20 +11,27 @@ class KGAgent(dspy.Module):
 
     def forward(self, question: str) -> str:
         # STEP 1: Extract units
-        units = self.extract_units(question)  #An ExtractedUnits pydantic instance is returned
+        units: ExtractedUnits= self.extract_units(question)  #An ExtractedUnits pydantic instance is returned
 
         # STEP 2: Check the knowledge graph
-        formula = lookup_conversion(units)  #Returns formula string or None
+        formula: str | None = lookup_conversion(units)  #Returns formula string or None
 
         #If formula is found in the KG, return it
         if formula:
-            print("Formula found in Knowledge Graph")
-            return f"From the knowledge graph: {formula}"
+            return f"Formula found in the knowledge graph: {formula}"
         
         #Initialize the loop count and feedback string
         loop_counter: int = 0
         feedback: str = ""
 
+        #Conversion Validator checks if the unit conversion is possible
+        is_valid = conversion_validator(units)
+
+        if not is_valid:
+            print("Conversion is not possible")
+            return None # Conversion is not Possible so it will return None 
+
+        #Conversion is valid, proceed to ask the LLM for formula and test it
         #While Loop Starts from here
         while(loop_counter < 3):  #Limit to 3 iterations for safety
             # STEP 3: If formula is missing (lookup_conversion gives None) → Ask LLM for the formula
@@ -62,8 +68,6 @@ class KGAgent(dspy.Module):
                 )
                 store_conversion(data)
                 return f"I learned this rule from the LLM: {result.formula}"
-            
-            loop_counter: int = loop_counter + 1 #Increment loop counter after checking the score
 
             #Else, the feedback score is sent back to the AskFormula module for fine-tuning 
             markdown_feedback: str = failed_test_cases_to_markdown(failed_cases, result.formula)
@@ -83,7 +87,11 @@ class KGAgent(dspy.Module):
             Please correct the formula so that it passes **all** test cases.
             """.strip()
 
-        return f"Unable to determine a reliable formula after multiple attempts."
+            loop_counter: int = loop_counter + 1 #Increment loop counter after checking the score
+
+
+        print(f"Unable to determine a reliable formula after {loop_counter} attempts.")
+        return None
 
 
 agent = KGAgent()

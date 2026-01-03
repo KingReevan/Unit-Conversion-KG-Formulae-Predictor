@@ -3,12 +3,13 @@ from pydantic import BaseModel, field_validator, ConfigDict
 from engine import invert_formula
 from dotenv import load_dotenv
 from extract import ExtractedUnits
+import os
 
 load_dotenv()
 
 driver = GraphDatabase.driver(
-    "bolt://localhost:7687",
-    auth=("neo4j", "reevantheking19$$")
+    os.environ.get("NEO4J_URI"),
+    auth=(os.environ.get("NEO4J_USER"), os.environ.get("NEO4J_PASSWORD"))
 )
 
 class ConversionRelation(BaseModel):

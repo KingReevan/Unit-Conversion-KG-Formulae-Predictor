@@ -178,8 +178,6 @@ class AskFormula(dspy.Module):
             desc="The correct conversion formula using full unit names only. No abbreviations.",
             type=str
         )
-
-        #Signature to validate conversion units
     
 
     def __init__(self) -> None:
@@ -196,11 +194,6 @@ class AskFormula(dspy.Module):
         :param to_unit: The unit to be converted to
         :param feedback: Feedback from previous test case failures to improve formula accuracy
         """
-
-        is_valid = self.validator(units)
-
-        if not is_valid:
-            return None # Conversion is not meaningful so it will return None 
         
         raw_predicted_formula = self.predict(from_unit=units.from_unit, to_unit=units.to_unit, feedback=feedback) #Prediction is performed here
 
@@ -208,5 +201,7 @@ class AskFormula(dspy.Module):
         validated = FormulaResult.model_validate(raw_predicted_formula.toDict())
         return validated
 
+#Class Instances
+conversion_validator = ConversionValidator()
 ask_formula = AskFormula()
 test_case_generator = FormulaTestCaseGenerator()
