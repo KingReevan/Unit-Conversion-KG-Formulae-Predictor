@@ -12,15 +12,18 @@ def parse_formula(formula: str):
     lhs_str: str = lhs_str.strip()
     rhs_str = rhs_str.strip()
 
-    lhs = symbols(lhs_str)
+    lhs = symbols(lhs_str)  #Converts the LHS into a sympy symbol
+    rhs_str: str = rhs_str.replace('×','*').replace("÷", "/")   
+    rhs_expr = sympify(rhs_str)  #Converts RHS into a sympy expression
 
-    rhs_str: str = rhs_str.replace('×','*').replace("÷", "/")
-    rhs_expr = sympify(rhs_str)
+    print(lhs)
+    print(lhs_str)
+    print(rhs_str)
+    
+    return lhs_str, lhs, rhs_expr
 
-    return lhs_str, lhs, rhs_expr #I will make a pydantic for this later
 
-
-def evaluate_formula(formula: str, **inputs) -> float:
+def evaluate_formula(formula: str, **inputs) -> float:        #Takes in a formula string and variable inputs
     """
     Evaluates formulas stored in KG safely.
     
@@ -71,3 +74,4 @@ def invert_formula(formula: str) -> str:
 
     return inverse_formula
 
+parse_formula("meters = centimeters / 100")

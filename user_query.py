@@ -50,7 +50,7 @@ class KGAgent(dspy.Module):
             print(f"Generated Test Cases: {test_cases.test_cases}")
 
             #The test runner will return a score based on how many test cases passed
-            
+
             test_runner_output: TestRunnerOutput = run_formula_tests(
                 formula = result.formula,
                 test_cases = test_cases.test_cases
@@ -74,6 +74,7 @@ class KGAgent(dspy.Module):
             #Else, the feedback score is sent back to the AskFormula module for fine-tuning 
             markdown_feedback: str = failed_test_cases_to_markdown(test_runner_output.failed_test_cases, result.formula)
 
+            #More detailed feedback which allows for modification
             feedback: str = f"""
             ## 🔍 Formula Evaluation Feedback
 

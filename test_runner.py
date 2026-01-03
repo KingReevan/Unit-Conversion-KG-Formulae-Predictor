@@ -45,9 +45,9 @@ def run_formula_tests(
             output = evaluate_formula(
                 formula,
                 **{input_var: case.input_value}
-            )
+            ) #The formula is evaluated here, input is the formula string and the test case input value
 
-            if math.isclose(
+            if math.isclose(     #Compares the expected output and actual
                 output,
                 case.expected_output,
                 rel_tol=rel_tol,
@@ -61,13 +61,13 @@ def run_formula_tests(
             # Any evaluation failure counts as test failure
             failed_cases.append(case)
 
+    test_score: float = passed / len(test_cases)
 
-    test_score = passed / len(test_cases)
     output = TestRunnerOutput(
         score=test_score,
         failed_test_cases=failed_cases
     )
-    
+
     return output
 
 def failed_test_cases_to_markdown(
