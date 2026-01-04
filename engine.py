@@ -1,6 +1,7 @@
 from sympy import symbols, sympify, Eq, solve
 import re
 
+#Regex pattern to match variable names with spaces so that they can be replaced with underscores
 VARIABLE_PATTERN = re.compile(
     r'\b([a-zA-Z]+(?:\s+[a-zA-Z]+)+)\b'
 )
@@ -59,6 +60,7 @@ def invert_formula(formula: str) -> str:
         centimeters = meters * 100
     """
 
+    formula = normalize_variables(formula)
     u1_str, u1_sym, expr = parse_formula(formula)
 
     # The RHS should contain exactly one variable (the input unit)

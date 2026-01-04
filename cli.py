@@ -1,9 +1,7 @@
 import typer
 from user_query import agent
+from utils import console, benchmark
 
-app = typer.Typer()
-
-@app.command()
 def ask(query: str) -> None:
     """
     Ask Knowledge Graph for Unit Conversions
@@ -13,4 +11,10 @@ def ask(query: str) -> None:
 
 
 if __name__ == "__main__":
-    app()
+    while True:
+        user_input = typer.prompt("Enter your conversion question (or type 'exit' to quit)")
+        if user_input.lower() == 'exit':
+            console.print("Exiting the program. Goodbye!")
+            break
+        with benchmark("Total Query Time"):
+            ask(user_input)

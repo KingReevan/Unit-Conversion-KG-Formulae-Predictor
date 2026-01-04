@@ -4,6 +4,7 @@ from engine import invert_formula
 from dotenv import load_dotenv
 from extract import ExtractedUnits
 import os
+from utils import console
 
 load_dotenv()
 
@@ -42,7 +43,7 @@ def lookup_conversion(units: ExtractedUnits) -> str | None:
 
 #To Store a new conversion between two units
 def store_conversion(relation: ConversionRelation):
-    print(relation)
+    console.print(relation)
     with driver.session() as session:
         # Access extra fields
         extras = relation.model_extra or {}
@@ -58,7 +59,7 @@ def store_conversion(relation: ConversionRelation):
         unit2=relation.to_unit,
         props=props
         )
-        print(f"Forward stored: {relation.from_unit} → {relation.to_unit}")
+        console.print(f"Forward stored: {relation.from_unit} → {relation.to_unit}")
 
 
     inverse_formula_exists = lookup_conversion(ExtractedUnits(
@@ -67,13 +68,13 @@ def store_conversion(relation: ConversionRelation):
     ))
 
     if inverse_formula_exists:
-        print("Inverse formula exists already")
+        console.print("Inverse formula exists already")
         return 
 
     try:
         inverse_formula = invert_formula(relation.formula)
     except Exception as e:
-        print("Could not compute inverse automatically:", e)
+        console.print("Could not compute inverse automatically:", e)
         return
     
     # 4. Store inverse relation
@@ -88,4 +89,4 @@ def store_conversion(relation: ConversionRelation):
         unit2=relation.from_unit,
         inverse_formula=inverse_formula)
 
-        print(f"Inverse stored: {relation.to_unit} → {relation.from_unit}: {inverse_formula}")
+        console.print(f"Inverse stored: {relation.to_unit} → {relation.from_unit}: {inverse_formula}")

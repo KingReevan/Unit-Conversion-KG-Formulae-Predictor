@@ -2,6 +2,7 @@ import dspy
 from extract import ExtractUnits, ConversionValidator, AskFormula, FormulaTestCaseGenerator, ExtractedUnits, FormulaResult
 from neo import lookup_conversion, store_conversion, ConversionRelation
 from test_runner import run_formula_tests, failed_test_cases_to_markdown, TestRunnerOutput
+from utils import console
 
 #The pipeline
 class KGAgent(dspy.Module):
@@ -31,23 +32,23 @@ class KGAgent(dspy.Module):
         is_valid: bool = self.conversion_validator(units)
 
         if not is_valid:
-            print("Conversion is not possible")
+            console.print("Conversion is not possible")
             return None # Conversion is not Possible so it will return None 
 
         #Conversion is valid, proceed to ask the LLM for formula and test it
         #While Loop Starts from here
         while(loop_counter < 3):  #Limit to 3 iterations for safety
             # STEP 3: If formula is missing (lookup_conversion gives None) → Ask LLM for the formula
-            print("Loop Counter = ", loop_counter)
+            console.print("Loop Counter = ", loop_counter)
 
             result: FormulaResult = self.ask_formula(units=units,feedback=feedback)  # returns a FormulaResult instance
             
-            print(f"LLM provided formula: {result.formula}")
+            console.print(f"LLM provided formula: {result.formula}")
 
             #Test the "Ask Formula" Agents output by Generating Test Cases 
             
             test_cases = self.test_case_generator(result.formula)  #Returns a TestCaseSet instance which is already validated beforehand
-            print(f"Generated Test Cases: {test_cases.test_cases}")
+            console.print(f"Generated Test Cases: {test_cases.test_cases}")
 
             #The test runner will return a score based on how many test cases passed
 
@@ -55,8 +56,8 @@ class KGAgent(dspy.Module):
                 formula = result.formula,
                 test_cases = test_cases.test_cases
             )
-            print(f"Formula Test Score: {test_runner_output.score}")
-            print(f"Failed Test Cases: {test_runner_output.failed_test_cases}")
+            console.print(f"Formula Test Score: {test_runner_output.score}")
+            console.print(f"Failed Test Cases: {test_runner_output.failed_test_cases}")
 
             #If the score is above a certain threshold, the formula is stored in the KG (At least 8 cases have to pass) and the loop breaks
             if(test_runner_output.score >= 0.8):
@@ -93,7 +94,7 @@ class KGAgent(dspy.Module):
             loop_counter: int = loop_counter + 1 #Increment loop counter after checking the score
 
 
-        print(f"Unable to determine a reliable formula after {loop_counter} attempts.")
+        console.print(f"Unable to determine a reliable formula after {loop_counter} attempts.")
         return None
 
 

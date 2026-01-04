@@ -2,6 +2,7 @@ import dspy
 from dotenv import load_dotenv
 from pydantic import BaseModel, field_validator
 from typing import Optional
+from utils import console
 
 load_dotenv()
 
@@ -136,7 +137,7 @@ class FormulaTestCaseGenerator(dspy.Module):
         self.generate = dspy.ChainOfThought(self.FormulaTestCaseSignature)
 
     def forward(self, formula: str) -> TestCaseSet:
-        print("Using Chain of Thought for Test Case Generation")
+        console.print("Using Chain of Thought for Test Case Generation")
         prediction = self.generate(formula=formula)
 
         # Convert DSPy output → Pydantic

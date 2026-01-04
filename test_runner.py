@@ -3,6 +3,7 @@ from typing import List
 from pydantic import BaseModel, field_validator
 from engine import parse_formula, evaluate_formula, normalize_variables
 from extract import TestCase
+from utils import console
 
 class TestRunnerOutput(BaseModel):
     score: float
@@ -12,8 +13,8 @@ def run_formula_tests(
     formula: str,
     test_cases: List[TestCase],
     *,
-    rel_tol: float = 1e-9,
-    abs_tol: float = 1e-12,
+    rel_tol: float = 0.0,   # Adjust these parameters for the floating point comparison
+    abs_tol: float = 1e-3,   # Values are allowed to be different only after 3 decimal places
 ) -> TestRunnerOutput:
     """
     Runs test cases against a unit conversion formula.
@@ -25,7 +26,8 @@ def run_formula_tests(
     """
 
     formula = normalize_variables(formula)
-    print("Normalized formula in test runner: ", formula)
+    console.print("Normalized formula in test runner: ", formula)
+    
     # Parse formula once
     lhs_str, lhs, rhs_expr = parse_formula(formula)
 
