@@ -7,6 +7,15 @@ VARIABLE_PATTERN = re.compile(
 )
 
 def normalize_variables(formula: str) -> str:
+    """
+    Replaces spaces within multi-word variable names with underscores.
+
+    Args:
+        formula: The string containing variables with spaces (e.g., "total price").
+
+    Returns:
+        A string where "variable name" becomes "variable_name".
+    """
     def replacer(match):
         return match.group(1).replace(" ", "_")
 
@@ -81,6 +90,7 @@ def invert_formula(formula: str) -> str:
     inverse_expr = solution[0]
     inverse_formula = f"{u2_str} = {inverse_expr}"
 
+    #Add Test Case Generation and Test Runner before returning the inverse formula. 
     return inverse_formula
 
 

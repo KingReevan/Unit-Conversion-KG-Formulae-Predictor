@@ -9,7 +9,7 @@ console = Console()
 def benchmark(label: str = "Block"):
     start = time.perf_counter()
     try:
-        yield
+        yield  #ask query runs here
     finally:
         end = time.perf_counter()
         elapsed = end - start

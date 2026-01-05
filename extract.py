@@ -165,6 +165,8 @@ class AskFormula(dspy.Module):
         5. The equation MUST be in the form:
         to_unit = <expression involving from_unit>
         6. The left-hand side (LHS) must always be the to_unit.
+        7. If the spelling for units have british and american variations, use british spelling.
+        8. Unit names must be in plural form (e.g., "meters", "inches").
         """
 
         from_unit: str = dspy.InputField(

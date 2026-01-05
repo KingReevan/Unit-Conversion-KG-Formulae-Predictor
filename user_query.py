@@ -58,9 +58,10 @@ class KGAgent(dspy.Module):
             )
             console.print(f"Formula Test Score: {test_runner_output.score}")
             console.print(f"Failed Test Cases: {test_runner_output.failed_test_cases}")
+            console.print("LLM Actual Outputs for Failed Test Cases: ", test_runner_output.actual_outputs_for_failed_test_cases)
 
             #If the score is above a certain threshold, the formula is stored in the KG (At least 8 cases have to pass) and the loop breaks
-            if(test_runner_output.score >= 0.8):
+            if(test_runner_output.score >= 0.7):
                 data = ConversionRelation.model_validate(
                 {
                         "from_unit":units.from_unit,

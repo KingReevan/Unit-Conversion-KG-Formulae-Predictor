@@ -8,6 +8,7 @@ from utils import console
 class TestRunnerOutput(BaseModel):
     score: float
     failed_test_cases: List[TestCase]
+    actual_outputs_for_failed_test_cases: List[float]
 
 def run_formula_tests(
     formula: str,
@@ -43,6 +44,7 @@ def run_formula_tests(
 
     passed = 0
     failed_cases: List[TestCase] = []
+    actual_outputs_for_failed_test_cases = []
 
     for case in test_cases:
         try:
@@ -59,6 +61,7 @@ def run_formula_tests(
                 passed += 1
             else:
                 failed_cases.append(case)
+                actual_outputs_for_failed_test_cases.append(output)
 
         except Exception:
             # Any evaluation failure counts as test failure
@@ -68,7 +71,8 @@ def run_formula_tests(
 
     output = TestRunnerOutput(
         score=test_score,
-        failed_test_cases=failed_cases
+        failed_test_cases=failed_cases,
+        actual_outputs_for_failed_test_cases=actual_outputs_for_failed_test_cases
     )
 
     return output
@@ -77,6 +81,11 @@ def failed_test_cases_to_markdown(
     failed_cases: List[TestCase],
     formula: str | None = None
 ) -> str:
+    
+    """
+    Creates a markdown table summarizing failed test cases. Returns an empty string if there are no failed cases.
+    """
+
     if not failed_cases:
         return ""
 
@@ -101,14 +110,12 @@ def failed_test_cases_to_markdown(
 
     return "\n".join(lines)
 
-
-# formula = "centimeters = meters per hour* 100"
+#This formula does not work for reasons unexplained
+# formula = "kelvin = (fahrenheit - 32) * (5/9) + 273.15"
 
 # test_cases = [
-#     TestCase(input_value=1.0, expected_output=100.0),
+#     TestCase(input_value=0, expected_output=-459.67),
 #     TestCase(input_value=2.5, expected_output=2950.0),
-#     TestCase(input_value=0.0, expected_output=40.0),
-#     TestCase(input_value=-1.0, expected_output=-100.0),
 # ]
 
 # score, failures = run_formula_tests(formula, test_cases)
