@@ -1,11 +1,9 @@
 import dspy
-from dotenv import load_dotenv
 import json
 from typing import Dict, List
 from pydantic import BaseModel
 from utils import console
 
-load_dotenv()
 
 dspy.configure(
     lm=dspy.LM(
@@ -72,13 +70,13 @@ class ParagraphClassifier(dspy.Module):
 
         return prediction
  
+
 json_category_definitions = {
-    "Technical": "Paragraphs that discuss technical topics, concepts, or jargon related to specific fields such as engineering, computer science, or technology.",
-    "Marketing": "Paragraphs that focus on promoting products, services, or brands, often using persuasive language and highlighting benefits to potential customers.",
-    "Legal": "Paragraphs that contain legal terminology, discuss laws, regulations, contracts, or legal procedures.",
-    "Financial": "Paragraphs that deal with financial topics such as investments, markets, economic trends, personal finance, or accounting.",
-    "Health": "Paragraphs that cover topics related to health, medicine, wellness, medical conditions, treatments, or healthcare systems.",
     "Manufacturer": "Information that identifies who makes or produces the product. Includes manufacturer name, brand, OEM/ODM details, parent company, or manufacturing responsibility.",
+    "Identifier": "Information used to uniquely identify the product. Includes product name, model number, part number, SKU, serial number, version, or reference codes.",
+    "Specification": "Information describing measurable or declarative technical properties. Must compulsarily mention electrical, mechanical, environmental, or performance characteristics such as voltage, current, dimensions, ratings, tolerances, or materials. If no such details are present, do not classify as Specification.",
+    "Working Principles": "Information explaining how the product works or operates. Includes functional descriptions, operating logic, process explanations, or underlying technologies.",
+    "Regulatory & Compliance": "Information related to standards, certifications, or legal conformity. Includes CE, UL, RoHS, FCC, ISO, safety approvals, or declarations of conformity.",
     "Address": "Information describing physical or legal locations. Includes manufacturer address, headquarters, production site, mailing address, city, country, or place of origin."
 }
 
@@ -87,16 +85,6 @@ if __name__ == "__main__":
  
     classifier = ParagraphClassifier()
  
-    sample_paragraph = """
-    Various calibration options are available for the configurable
-    output signals of the KiTorq System. The calibration takes
-    place on a high-precision calibration system that is traceable
-    to ­national standards.
- 
-        Eulachstrasse 22, 8408 Winterthur, Switzerland
-    phone +41 52 224 11 11, Fax +41 52 224 14 14, info@kistler.com, www.kistler.com
-    Kistler is a registered trademark of Kistler Holding AG."""
- 
     while True:
         input_paragraph: str = input("Enter the paragraph to classify: ")
 
@@ -104,5 +92,6 @@ if __name__ == "__main__":
     
         console.print("Selected Categories: ", result.selected_categories)
         console.print("Reasoning: ", result.reasoning)
+        console.print("----------------------------------------------------------------------------------------\n")
 
 
